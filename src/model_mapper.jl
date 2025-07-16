@@ -32,10 +32,7 @@ end
     # du2 = -d*u[2] + u[1] - u[1]^3 + F*sin(omega*t)
 
 function get_mapper(dps::MetaAtomParameters)
-    (;ω, σ, β, η, μ, δ) = dps
-    diffeq = (alg = Vern9(), reltol = 1e-8, maxiters = 1e6)
-    ds = CoupledODEs(oscillator_model!, rand(2), dps; diffeq)
-    smap = StroboscopicMap(ds, 2*pi/ω) # Stroboscopic map definition
+    smap = get_smap(dps)
     yg =  collect(range(-20, 20; length = 5001))
     grid = (yg, yg)
     mapper = AttractorsViaRecurrences(smap, grid; 
@@ -45,6 +42,13 @@ function get_mapper(dps::MetaAtomParameters)
     return mapper
 end
 
+function get_smap(dps::MetaAtomParameters)
+    (;ω, σ, β, η, μ, δ) = dps
+    diffeq = (alg = Vern9(), reltol = 1e-8, maxiters = 1e6)
+    ds = CoupledODEs(oscillator_model!, rand(2), dps; diffeq)
+    smap = StroboscopicMap(ds, 2*pi/ω) # Stroboscopic map definition
+    return smap
+end
 
 function get_trajectory(u0, T, di::Dict)
     @unpack  N, c, k1, k3, F, kc, ω = di

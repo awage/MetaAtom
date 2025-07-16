@@ -5,7 +5,7 @@ using LaTeXStrings
 using Attractors
 
 include(srcdir("model_mapper.jl"))
-
+include(srcdir("bifur_diag.jl"))
 
 function compute_delta_sweep(params::Dict)
     @unpack  Np, Nsamples = params
@@ -28,18 +28,31 @@ function compute_delta_sweep(params::Dict)
         ascm, prange, pidx, sampler; samples_per_parameter = Nsamples
     )
 
-    return @strdict(fractions_cont,  attractors_cont, prange, dps)
+    branches = get_branches(prange, pidx, dps, attractors_cont)
+
+    return @strdict(fractions_cont,  attractors_cont, prange, dps, branches)
 end
 
 
-Np = 500; Nsamples = 1000
+Np = 250; Nsamples = 5000
 params = @strdict Np Nsamples
 
 dat, _ = produce_or_load(compute_delta_sweep, params; prefix = "delta_sweep", force = false)
 
-@unpack fractions_cont, attractors_cont, prange = dat
+@unpack fractions_cont, attractors_cont, prange, branches = dat
 
-fig = plot_basins_attractors_curves(
-	fractions_cont, attractors_cont, A -> minimum(A[:, 1]), prange,
-)
 
+
+colors = colors_from_keys(keys(fractions_cont))
+fig = plot_basins_curves(fractions_cont, prange; colors)
+
+# fig = plot_attractors_curves(fractions_cont, attractors_cont, A -> minimum(A[:, 1]), prange)
+#
+# P = get_bif_points(branches)
+# fig = Figure(size = (1524, 568))
+
+ax = Axis(fig[2,1], ylabel = "xn", yticklabelsize = 20, xticklabelsize = 20, ylabelsize = 20, xlabel = L"\delta")
+for (j,p) in enumerate(branches)
+    P = StateSpaceSet(p[2])
+    scatter!(ax, P[:,1],P[:,2], markersize = 2.7, color = colors[j], rasterize = true)
+end

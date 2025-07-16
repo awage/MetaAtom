@@ -1,3 +1,37 @@
+function _get_basin_entropy(dps, δ, grid;  show_progress = false) 
+        dps.δ = δ
+        mapper = get_mapper(dps)
+        bas, _ = basins_of_attraction(mapper, grid; show_progress) 
+        Sb,Sbb = basin_entropy(bas, 10) 
+        return Sb, Sbb, bas
+end
+
+function compute_entropy(d)
+    @unpack  δrange, dps, grid = d
+    Sb = zeros(length(δrange))
+    Sbb = zeros(length(δrange))
+    @Threads.threads for k in eachindex(δrange)
+        @show δrange[k]
+        Sb[k], Sbb[k], _ = _get_basin_entropy(deepcopy(dps), δrange[k], grid)
+    end
+    return @strdict(Sb, Sbb, δrange)
+end
+
+function get_entropy(δrange, dps, grid; force = false)
+    δi = δrange[1]
+    δf = δrange[end]
+    N = length(δrange)
+    d = @strdict  dps grid δrange δi δf N
+    data, file = produce_or_load(
+        compute_entropy,
+        d, 
+        datadir();
+        prefix = "model_entropy", storepatch = false,
+        suffix = "jld2", force = force
+    )
+    return data
+end
+
 
 
 function get_branches(prange, pidx, dps ,att)

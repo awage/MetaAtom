@@ -28,12 +28,12 @@ function compute_delta_sweep(params::Dict)
     return @strdict(fractions_cont,  attractors_cont, δrange, dps, branches)
 end
 
-force = false
+force = true
 σ = 0.3; ω = 1.0; μ = 35.0; η = 0.08; δ = 1.0; β = 0.4
 dps = model_parameters(ω, σ, β, η, μ, δ)
 res = 100
 yg = range(-5,5, length=res); grid = (yg, yg) 
-Np = 200; Nsamples = 1000
+Np = 15; Nsamples = 10
 δrange = range(-30, 30, length = Np)
 
 
@@ -42,7 +42,7 @@ params = @strdict Np Nsamples δrange dps grid
 dat, _ = produce_or_load(compute_delta_sweep, params, datadir(); prefix = "delta_sweep", force)
 
 # Compute the basin entropy for the same range of parameters
-dat_ent = get_entropy(δrange, dps, grid; force)
+dat_ent = get_entropy_δ_sweep(δrange, dps, grid; force)
 
 
 

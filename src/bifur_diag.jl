@@ -1,29 +1,53 @@
-function _get_basin_entropy(dps, δ, grid;  show_progress = false) 
-        dps.δ = δ
-        mapper = get_mapper(dps)
-        bas, _ = basins_of_attraction(mapper, grid; show_progress) 
-        Sb,Sbb = basin_entropy(bas, 10) 
-        return Sb, Sbb, bas
+function get_basins(dps, grid; force = true, show_progress = true)
+    @unpack σ , ω , μ , η , δ , β  = dps
+    params = @strdict dps grid σ  ω  μ  η  δ  β show_progress 
+    data, file = produce_or_load(
+        _get_basins,
+        params, 
+        datadir();
+        prefix = "model_basins", storepatch = false,
+        suffix = "jld2", force = force
+    )
+    return data
 end
 
-function compute_entropy(d)
+function _get_basins(d) 
+    @unpack dps, grid, show_progress = d 
+        mapper = get_mapper(dps)
+        bas, att = basins_of_attraction(mapper, grid; show_progress) 
+    return @strdict(att, bas, dps) 
+end
+
+
+# function get_basin_entropy(dps, grid; force = false, show_progress = false) 
+#         data = get_basins(dps, grid)
+#         @unpack bas = data
+#         Sb,Sbb = basin_entropy(bas, 10) 
+#         return Sb, Sbb, bas
+# end
+
+function compute_entropy_δ_sweep(d)
     @unpack  δrange, dps, grid = d
     Sb = zeros(length(δrange))
     Sbb = zeros(length(δrange))
     @Threads.threads for k in eachindex(δrange)
         @show δrange[k]
-        Sb[k], Sbb[k], _ = _get_basin_entropy(deepcopy(dps), δrange[k], grid)
+        dp = deepcopy(dps) 
+        dp.δ = δrange[k]
+        data = get_basins(dp, grid; force = true)
+        @unpack bas = data
+        Sb[k],Sbb[k] = basin_entropy(bas, 10) 
     end
     return @strdict(Sb, Sbb, δrange)
 end
 
-function get_entropy(δrange, dps, grid; force = false)
+function get_entropy_δ_sweep(δrange, dps, grid; force = false)
     δi = δrange[1]
     δf = δrange[end]
     N = length(δrange)
     d = @strdict  dps grid δrange δi δf N
     data, file = produce_or_load(
-        compute_entropy,
+        compute_entropy_δ_sweep,
         d, 
         datadir();
         prefix = "model_entropy", storepatch = false,
@@ -31,7 +55,6 @@ function get_entropy(δrange, dps, grid; force = false)
     )
     return data
 end
-
 
 
 function get_branches(prange, pidx, dps ,att)
@@ -61,14 +84,6 @@ function get_branches(prange, pidx, dps ,att)
 end
 
 
-function get_bif_points(branches::Dict)
-    s = collect(keys(branches))
-    bif_points = StateSpaceSet(branches[s[1]])
-    for k in 2:length(s)
-        append!(bif_points, StateSpaceSet(branches[s[k]]))
-    end
-    return bif_points
-end
 
 using Random: shuffle!, Xoshiro
 function colors_from_keys(ukeys)

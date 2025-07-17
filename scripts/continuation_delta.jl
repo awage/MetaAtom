@@ -54,15 +54,19 @@ colors = colors_from_keys(keys(fractions_cont))
 fig = plot_basins_curves(fractions_cont, δrange; colors)
 
 # Add the bifurcation diagram.
-ax = Axis(fig[2,1], ylabel = "xn", yticklabelsize = 20, xticklabelsize = 20, ylabelsize = 20)
-for (j,p) in enumerate(branches)
-    P = StateSpaceSet(p[2])
-    scatter!(ax, P[:,1],P[:,2], markersize = 2.7, color = colors[j], rasterize = true)
+
+# ss = continuation_series(fraction_cont)
+ax = Axis(fig[2,1], ylabel = "xn", yticklabelsize = 10, xticklabelsize = 20, ylabelsize = 20)
+for k in keys(branches)
+    P = StateSpaceSet(branches[k])
+    scatter!(ax, P[:,1],P[:,2], markersize = 2.1, color = colors[k], rasterize = false)
 end
+xlims!(ax,δrange[1],δrange[end])
 
 # Add the basin entropy
 @unpack Sb, Sbb = dat_ent
-ax = Axis(fig[3,1], ylabel = "Sb", yticklabelsize = 20, xticklabelsize = 20, ylabelsize = 20, xlabel = L"\delta")
+ax = Axis(fig[3,1], ylabel = "Sb", yticklabelsize = 10, xticklabelsize = 20, ylabelsize = 20, xlabel = L"\delta")
 scatter!(ax, δrange, Sb; markersize = 5)
+xlims!(ax,δrange[1],δrange[end])
 
 save("test.pdf",fig)

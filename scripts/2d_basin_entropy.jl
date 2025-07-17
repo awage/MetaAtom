@@ -12,20 +12,22 @@ force = false
 dps = model_parameters(ω, σ, β, η, μ, δ)
 res = 100
 yg = range(-5,5, length=res); grid = (yg, yg) 
-Np = 5; 
+Np = 15; 
 δrange = range(-30, 30, length = Np)
 σrange = range(0.1, 0.5, length = Np)
 
 Sb = zeros(Np, Np)
 Sbb = zeros(Np, Np)
-for j in eachindex(δrange) 
+@Threads.threads for j in eachindex(δrange) 
     @Threads.threads for k in eachindex(σrange)
         @show δrange[j], σrange[k]
         dp = deepcopy(dps) 
         dp.δ = δrange[j]
         dp.σ = σrange[k]
-        data = get_basins(dp, grid; force, show_progress = false)
+        data = get_basins(dp, grid; force, show_progress = true)
         @unpack bas = data
         Sb[j,k], Sbb[j,k] = basin_entropy(bas, 10) 
     end
 end
+
+heatmap(δrange, σrange, Sb)

@@ -33,7 +33,7 @@ force = true
 dps = model_parameters(ω, σ, β, η, μ, δ)
 res = 100
 yg = range(-5,5, length=res); grid = (yg, yg) 
-Np = 15; Nsamples = 10
+Np = 150; Nsamples = 1000
 δrange = range(-30, 30, length = Np)
 
 

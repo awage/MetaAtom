@@ -3,6 +3,7 @@ using DrWatson
 using CairoMakie
 using LaTeXStrings
 using Attractors
+using ProgressMeter
 
 include(srcdir("model_mapper.jl"))
 include(srcdir("bifur_diag.jl"))
@@ -18,7 +19,7 @@ Np = 100;
 
 Sb = zeros(Np, Np)
 Sbb = zeros(Np, Np)
-@Threads.threads for j in eachindex(δrange) 
+@showprogress @Threads.threads for j in eachindex(δrange) 
     @Threads.threads for k in eachindex(σrange)
         @show δrange[j], σrange[k]
         dp = deepcopy(dps) 

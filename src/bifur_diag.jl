@@ -11,6 +11,24 @@ function get_basins(dps, grid; force = true, show_progress = true)
     return data
 end
 
+function get_basins_tmp(dps, grid; force = true, show_progress = true)
+    @unpack σ , ω , μ , η , δ , β  = dps
+    params = @strdict dps grid σ  ω  μ  η  δ  β show_progress 
+    data, file = produce_or_load(
+        tmp_f,
+        params, 
+        datadir();
+        prefix = "model_basins", storepatch = false,
+        suffix = "jld2", force = force
+    )
+    return data
+end
+
+function tmp_f(d)
+  a = 0
+  return @strdict(a)
+end
+
 function _get_basins(d) 
     @unpack dps, grid, show_progress = d 
         mapper = get_mapper(dps)

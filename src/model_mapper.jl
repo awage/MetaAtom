@@ -33,7 +33,7 @@ end
 
 function get_mapper(dps::MetaAtomParameters)
     smap = get_smap(dps)
-    yg =  collect(range(-20, 20; length = 50001))
+    yg =  collect(range(-30, 30; length = 10001))
     grid = (yg, yg)
     mapper = AttractorsViaRecurrences(smap, grid; 
                     consecutive_basin_steps = 100, 

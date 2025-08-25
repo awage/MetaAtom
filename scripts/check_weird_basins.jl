@@ -21,16 +21,21 @@ Sb = zeros(Np, Np)
 Sbb = zeros(Np, Np)
 @showprogress for j in eachindex(δrange) 
     for k in eachindex(σrange)
-        data = get_basins(dps, grid; force, show_progress = true)
-        @unpack bas = data
+        dp = deepcopy(dps) 
+        dp.δ = δrange[j]
+        dp.σ = σrange[k]
+        data = get_basins(dp, grid; force, show_progress = true)
+        @unpack  bas = data
         # Sb[j,k], Sbb[j,k] = basin_entropy(bas, 10) 
-        if length(unique(Na)) > 5
+        if length(unique(bas)) ≥ 4
             @show δrange[j], σrange[k]
             f = Figure(size = (800,800))
             ax = Axis(f[1,1], xlabel = L"x_1", ylabel = L"x_2") #, yscale = log10);
-            heatmap!(ax, xg, yg, bsn; rasterize = true)
-            params = (σ,  ω,  μ,  η,  δ,  β)
-            save(savename("weird",params, "pdf"),f)
+            
+            # heatmap!(ax, xg, yg, bsn; rasterize = true)
+            heatmap!(ax,  bas; rasterize = true)
+            # params = (σ ,  ω,  μ,  η,  δ,  β)
+            save(savename("weird",dp, "pdf"),f)
         end
     end
 end

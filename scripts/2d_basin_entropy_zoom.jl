@@ -15,8 +15,8 @@ res = 500
 yg = range(-5,5, length=res); grid = (yg, yg) 
 Np = 100; 
 
-δrange = range(-30, 30, length = Np)
-σrange = range(0.1, 0.5, length = Np)
+δrange = range(-30, -20, length = Np)
+σrange = range(0.1, 0.35, length = Np)
 
 Sb = zeros(Np, Np)
 Sbb = zeros(Np, Np)
@@ -29,9 +29,9 @@ Sbb = zeros(Np, Np)
         data = get_basins(dp, grid; force, show_progress = true)
         @unpack bas = data
 
-        if length(unique(bas)) ≥ 4
-            data = get_basins(dp, grid; force = true, show_progress = true)
-        end
+        # if length(unique(bas)) ≥ 4
+        #     data = get_basins(dp, grid; force = true, show_progress = true)
+        # end
 
 
         # try 
@@ -51,8 +51,8 @@ Sbb = zeros(Np, Np)
 end
 
 fig = Figure(size = (600,600))
-ax = Axis(fig[1,1], ylabel = L"\delta", xlabel = L"\sigma",  yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15, xlabelsize = 15)
+ax = Axis(fig[1,1], xlabel = L"\delta", ylabel = L"\sigma",  yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15, xlabelsize = 15)
 heatmap!(ax, δrange, σrange, Sb; rasterize = true)
-save("2d_basin_entropy.pdf", fig)
+save("2d_basin_entropy_zoom.pdf", fig)
 
 

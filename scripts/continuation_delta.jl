@@ -27,7 +27,7 @@ function compute_delta_sweep(params::Dict)
     return @strdict(fractions_cont,  attractors_cont, δrange, dps, branches)
 end
 
-force = false 
+force = false
 σ = 0.3; ω = 1.0; μ = 35.0; η = 0.08; δ = 1.0; β = 0.4
 dps = model_parameters(ω, σ, β, η, μ, δ)
 res = 100
@@ -67,10 +67,34 @@ for k in keys(branches)
 end
 xlims!(ax,δrange[1],δrange[end])
 
+periods = [ Vector{Vector{Float64}}() for k in 1:13]
+for (j,aa) in enumerate(attractors_cont)
+    dp = deepcopy(dps) 
+    dp.δ = δrange[j]
+    smap = get_smap(dp)
+    # p = zeros(Int,length(aa))
+    for (k,att) in enumerate(aa)
+        l = lyapunov(smap, 1000, u0 = att[2][1])
+        # @show length(att[2]), sign(l), att[1] 
+       if l < 0 
+           push!(periods[att[1]], [δrange[j]; length(att[2])])
+       else
+           push!(periods[att[1]], [δrange[j]; -1.])
+       end
+    end
+end
+
+ax = Axis(fig[3,1], ylabel = "periods", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15)
+for k in 1:length(periods)
+    P = StateSpaceSet(periods[k])
+    scatter!(ax, P[:,1],P[:,2], markersize = 3.7, color = colors[k], rasterize = false)
+end
+xlims!(ax,δrange[1],δrange[end])
+
 # Add the basin entropy
 @unpack Sb, Sbb = dat_ent
-ax = Axis(fig[3,1], ylabel = "Sb", yticklabelsize = 10, xticklabelsize = 10, ylabelsize = 15, xlabel = L"\delta", xlabelsize = 20)
+ax = Axis(fig[4,1], ylabel = "Sb", yticklabelsize = 10, xticklabelsize = 10, ylabelsize = 15, xlabel = L"\delta", xlabelsize = 20)
 scatter!(ax, δrange, Sb; markersize = 5)
 xlims!(ax,δrange[1],δrange[end])
 
-save("test.pdf",fig)
+save("test.png",fig)

@@ -3,6 +3,7 @@ using DrWatson
 using CairoMakie
 using LaTeXStrings
 using Attractors
+using ChaosTools
 
 include(srcdir("model_mapper.jl"))
 include(srcdir("bifur_diag.jl"))
@@ -32,16 +33,16 @@ force = false
 dps = model_parameters(ω, σ, β, η, μ, δ)
 res = 100
 yg = range(-5,5, length=res); grid = (yg, yg) 
-Np = 250; Nsamples = 1000
+Np = 450; Nsamples = 3000
 δrange = range(-30, 30, length = Np)
 
 
 # Compute the fractions and attractor branches
 params = @strdict Np Nsamples δrange dps grid
-dat, _ = produce_or_load(compute_delta_sweep, params, datadir(); prefix = "delta_sweep", force)
+dat, _ = produce_or_load(compute_delta_sweep, params, datadir(); prefix = "delta_sweep", force = true)
 
 # Compute the basin entropy for the same range of parameters
-dat_ent = get_entropy_δ_sweep(δrange, dps, grid; force)
+dat_ent = get_entropy_δ_sweep(δrange, dps, grid; force = false)
 
 # Get variables from dictionary
 @unpack fractions_cont, attractors_cont, branches = dat
@@ -63,11 +64,11 @@ fig.current_axis.x.ylabelsize = 15
 ax = Axis(fig[2,1], ylabel = "xn", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15)
 for k in keys(branches)
     P = StateSpaceSet(branches[k])
-    scatter!(ax, P[:,1],P[:,3], markersize = 1.7, color = colors[k], rasterize = false)
+    scatter!(ax, P[:,1],P[:,3], markersize = 1.5, color = colors[k], rasterize = false)
 end
 xlims!(ax,δrange[1],δrange[end])
 
-periods = [ Vector{Vector{Float64}}() for k in 1:13]
+periods = [ Vector{Vector{Float64}}() for k in 1:length(branches)]
 for (j,aa) in enumerate(attractors_cont)
     dp = deepcopy(dps) 
     dp.δ = δrange[j]
@@ -79,15 +80,17 @@ for (j,aa) in enumerate(attractors_cont)
        if l < 0 
            push!(periods[att[1]], [δrange[j]; length(att[2])])
        else
-           push!(periods[att[1]], [δrange[j]; -1.])
+           push!(periods[att[1]], [δrange[j]; 32])
        end
     end
 end
 
-ax = Axis(fig[3,1], ylabel = "periods", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15)
+yticks = ([1, 2, 4, 8, 16, 32], ["1", "2", "4", "8", "16", "Chaos"])
+ax = Axis(fig[3,1]; ylabel = "periods", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15, yticks, yscale = log2)
 for k in 1:length(periods)
     P = StateSpaceSet(periods[k])
     scatter!(ax, P[:,1],P[:,2], markersize = 3.7, color = colors[k], rasterize = false)
+    lines!(ax, P[:,1],P[:,2]; linewidth = 1, color = colors[k], rasterize = false)
 end
 xlims!(ax,δrange[1],δrange[end])
 

@@ -39,7 +39,7 @@ Np = 800; Nsamples = 3000
 
 # Compute the fractions and attractor branches
 params = @strdict Np Nsamples δrange dps grid
-dat, _ = produce_or_load(compute_delta_sweep, params, datadir(); prefix = "delta_sweep", force)
+dat, _ = produce_or_load(compute_delta_sweep, params, datadir(); prefix = "delta_sweep", force = false)
 
 # Compute the basin entropy for the same range of parameters
 dat_ent = get_entropy_δ_sweep(δrange, dps, grid; force = false)
@@ -48,7 +48,7 @@ dat_ent = get_entropy_δ_sweep(δrange, dps, grid; force = false)
 @unpack fractions_cont, attractors_cont, branches = dat
 
 # First paint the bands for the volume of each attractors
-colors = colors_from_keys(keys(fractions_cont))
+colors = colors_from_keys(unique_keys(fractions_cont))
 fig = plot_basins_curves(fractions_cont, δrange; colors)
 
 # Custom modification of fig

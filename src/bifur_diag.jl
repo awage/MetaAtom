@@ -52,7 +52,7 @@ function compute_entropy_δ_sweep(d)
         @show δrange[k]
         dp = deepcopy(dps) 
         dp.δ = δrange[k]
-        data = get_basins(dp, grid; force = true)
+        data = get_basins(dp, grid; force = false)
         @unpack bas = data
         Sb[k],Sbb[k] = basin_entropy(bas, 10) 
     end

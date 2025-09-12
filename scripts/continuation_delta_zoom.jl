@@ -34,12 +34,12 @@ dps = model_parameters(ω, σ, β, η, μ, δ)
 res = 400
 yg = range(-5,5, length=res); grid = (yg, yg) 
 Np = 800; Nsamples = 3000
-δrange = range(-30, 30, length = Np)
+δrange = range(-30, -20, length = Np)
 
 
 # Compute the fractions and attractor branches
 params = @strdict Np Nsamples δrange dps grid
-dat, _ = produce_or_load(compute_delta_sweep, params, datadir(); prefix = "delta_sweep", force)
+dat, _ = produce_or_load(compute_delta_sweep, params, datadir(); prefix = "delta_sweep_zoom", force)
 
 # Compute the basin entropy for the same range of parameters
 dat_ent = get_entropy_δ_sweep(δrange, dps, grid; force = false)

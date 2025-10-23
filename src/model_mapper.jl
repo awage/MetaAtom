@@ -50,12 +50,16 @@ function get_smap(dps::MetaAtomParameters)
     return smap
 end
 
-function get_trajectory(u0, T, di::Dict)
-    @unpack  N, c, k1, k3, F, kc, ω = di
-    W = coupling_matrix(N)
-    diffeq = (alg = Vern9(), reltol = 1e-6, maxiters = 1e8)
-    ds = CoupledODEs(coupled_duffings!, rand(N*2), (N, W, c, k1, k3, F, kc, ω); diffeq)
-    smap = StroboscopicMap(ds, 2*pi/ω) # Stroboscopic map definition
+function get_trajectory_map(u0, T, dps::MetaAtomParameters)
+    smap = get_smap(dps)
     y,t = trajectory(smap, T, u0) 
+    return  y,t 
+end
+
+function get_trajectory_ode(u0, T, dps::MetaAtomParameters)
+    (;ω, σ, β, η, μ, δ) = dps
+    diffeq = (alg = Vern9(), reltol = 1e-8, maxiters = 1e6)
+    ds = CoupledODEs(oscillator_model!, rand(2), dps; diffeq)
+    y,t = trajectory(ds, T, u0; Δt = 0.01) 
     return  y,t 
 end

@@ -61,10 +61,10 @@ fig.current_axis.x.ylabelsize = 15
 # Add the bifurcation diagram.
 
 # ss = continuation_series(fraction_cont)
-ax = Axis(fig[2,1], ylabel = "xn", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15)
+ax = Axis(fig[2,1], ylabel = "q", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15)
 for k in keys(branches)
     P = StateSpaceSet(branches[k])
-    scatter!(ax, P[:,1],P[:,3], markersize = 1.5, color = colors[k], rasterize = false)
+    scatter!(ax, P[:,1],P[:,3], markersize = 1.0, color = colors[k], rasterize = false)
 end
 xlims!(ax,δrange[1],δrange[end])
 
@@ -75,7 +75,7 @@ for (j,aa) in enumerate(attractors_cont)
     smap = get_smap(dp)
     # p = zeros(Int,length(aa))
     for (k,att) in enumerate(aa)
-        l = lyapunov(smap, 1000, u0 = att[2][1])
+        l = lyapunov(smap, 1000, u0 = att[2][1]; Ttr = 100)
         # @show length(att[2]), sign(l), att[1] 
        if l < 0 
            push!(periods[att[1]], [δrange[j]; length(att[2])])
@@ -97,7 +97,9 @@ xlims!(ax,δrange[1],δrange[end])
 # Add the basin entropy
 @unpack Sb, Sbb = dat_ent
 ax = Axis(fig[4,1], ylabel = "Sb", yticklabelsize = 10, xticklabelsize = 10, ylabelsize = 15, xlabel = L"\delta", xlabelsize = 20)
-scatter!(ax, δrange, Sb; markersize = 5)
+scatter!(ax, δrange, Sb; markersize = 3)
+lines!(ax, δrange, Sb; linewidth = 0.5)
 xlims!(ax,δrange[1],δrange[end])
 
-save("test.png",fig)
+save("continuation.png",fig)
+save("continuation.pdf",fig)

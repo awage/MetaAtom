@@ -5,27 +5,35 @@ using ProgressMeter
 include(srcdir("model_mapper.jl"))
 
 
-function compute_basins(mapper)
-    xg = yg = range(-5,5, length = 100) 
+function compute_basins(mapper, xg, yg)
     bsn = @showprogress [ mapper([x; y]) for x in xg, y in yg]
     att = extract_attractors(mapper)
     return bsn,  att
 end
 
-σ = 0.3; ω = 1.0; μ = 35.0; η = 0.08; δ = 1.0; β = 0.4
+res = 300
+
+f = Figure(size = (400,400))
+σ = 0.3; ω = 1.0; μ = 35.0; η = 0.08; δ = -25.9; β = 0.4;
 dps = model_parameters(ω, σ, β, η, μ, δ)
-
-
-# compute basins
+yg = range(-80,40, length = res) 
+xg = range(-15,25, length = res) 
 mapper = get_mapper(dps)
-bsn, att = compute_basins(mapper)
+bsn, att = compute_basins(mapper, xg, yg)
+labs_args = (ylabel = L"i_0", xlabel = L"q_0", yticklabelsize = 20,  ylabelsize = 25, xticklabelsize = 20,  xlabelsize = 25)
+ax = Axis(f[1,1]; labs_args...) #, yscale = log10);
+heatmap!(ax, yg, xg, bsn'; rasterize = true)
+save("basins_delta_-25.9.pdf",f)
 
-xg = yg = range(-5,5, length = 100) 
-
-f = Figure(size = (800,800))
-ax = Axis(f[1,1], xlabel = L"x_1", ylabel = L"x_2") #, yscale = log10);
-
-heatmap!(ax, xg, yg, bsn; rasterize = true)
-
-save("test.pdf",f)
+f = Figure(size = (400,400))
+σ = 0.3; ω = 1.0; μ = 35.0; η = 0.08; δ = -25.0; β = 0.4; 
+dps = model_parameters(ω, σ, β, η, μ, δ)
+yg = range(-80,40, length = res) 
+xg = range(-15,25, length = res) 
+mapper = get_mapper(dps)
+bsn, att = compute_basins(mapper, xg, yg)
+labs_args = (ylabel = L"i_0", xlabel = L"q_0", yticklabelsize = 20,  ylabelsize = 25, xticklabelsize = 20,  xlabelsize = 25)
+ax = Axis(f[1,1]; labs_args...) #, yscale = log10);
+heatmap!(ax, yg, xg, bsn'; rasterize = true)
+save("basins_delta_-25.0.pdf",f)
 

@@ -107,5 +107,4 @@ lines!(ax, [-27.47; -27.47], [0.;  0.3]; linewidth = 1.5, linestyle = :dash, col
 lines!(ax, [-25.9; -25.9], [0.;  0.3]; linewidth = 1.5, linestyle = :dashdot, color = :black)
 lines!(ax, [-28.84;  -28.84], [0.; 0.3]; linewidth = 1.5, linestyle = :dash, color = :black)
 
-save("continuation_zoom.png",fig)
-save("continuation_zoom.pdf",fig)
+save("fig4.pdf",fig)

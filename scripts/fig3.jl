@@ -101,5 +101,4 @@ scatter!(ax, δrange, Sb; markersize = 3)
 lines!(ax, δrange, Sb; linewidth = 0.5)
 xlims!(ax,δrange[1],δrange[end])
 
-save("continuation.png",fig)
-save("continuation.pdf",fig)
+save("fig3.pdf",fig)

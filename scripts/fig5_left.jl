@@ -130,5 +130,5 @@ ax_inset = Axis(fig[2, 3];  labs_iq...)
 lines!(ax_inset, t[1:1500]./(2*π), y2[1:1500,1]; linewidth = 0.5, color = :black)
 
 # save("orbit_delta=-25.94.png",fig)
-save("fig5b_2.png",fig)
+save("fig5b_1.png",fig)
 

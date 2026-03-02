@@ -22,7 +22,7 @@ mapper = get_mapper(dps)
 bsn, att = compute_basins(mapper, xg, yg)
 labs_args = (ylabel = L"i_0", xlabel = L"q_0", yticklabelsize = 20,  ylabelsize = 25, xticklabelsize = 20,  xlabelsize = 25)
 ax = Axis(f[1,1]; labs_args...) #, yscale = log10);
-heatmap!(ax, yg, xg, bsn'; rasterize = true)
+heatmap!(ax, yg, xg, bsn'; rasterize = true, colormap = ColorScheme([RGB(0.1,0.1,0.1), RGB(1,0.1,0.1),  RGB(0.24,0.24,1)]))
 save("basins_delta_-25.9.pdf",f)
 
 f = Figure(size = (400,400))
@@ -34,6 +34,6 @@ mapper = get_mapper(dps)
 bsn, att = compute_basins(mapper, xg, yg)
 labs_args = (ylabel = L"i_0", xlabel = L"q_0", yticklabelsize = 20,  ylabelsize = 25, xticklabelsize = 20,  xlabelsize = 25)
 ax = Axis(f[1,1]; labs_args...) #, yscale = log10);
-heatmap!(ax, yg, xg, bsn'; rasterize = true)
+heatmap!(ax, yg, xg, bsn'; rasterize = true, colormap = ColorScheme([RGB(0.1,0.1,0.1), RGB(1,0.1,0.1),  RGB(0.24,0.24,1)]))
 save("basins_delta_-25.0.pdf",f)
 

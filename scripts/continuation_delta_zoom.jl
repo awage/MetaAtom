@@ -49,19 +49,20 @@ dat_ent = get_entropy_δ_sweep(δrange, dps, grid; force = false)
 
 # First paint the bands for the volume of each attractors
 colors = colors_from_keys(unique_keys(fractions_cont))
-fig = plot_basins_curves(fractions_cont, δrange; colors)
+
+lab_args = (yticklabelsize = 10, xticklabelsize = 10,   ylabelsize = 17, xlabelsize = 17, xminorticks = IntervalsBetween(5), xminorticksvisible = true, xminorgridvisible = true)
+
+fig = Figure(size = (400, 400))
+ax = Axis(fig[1,1]; ylabel = "Fractions", xticklabelsvisible = false,lab_args...)
+Attractors.plot_basins_curves!(ax, fractions_cont, δrange; colors) 
 
 # Custom modification of fig
-fig.current_axis.x.xticklabelsvisible = false
-fig.current_axis.x.xlabel = ""
-fig.current_axis.x.ylabel = "Fractions"
-fig.current_axis.x.yticklabelsize = 10
-fig.current_axis.x.ylabelsize = 15
 
 # Add the bifurcation diagram.
 
 # ss = continuation_series(fraction_cont)
-ax = Axis(fig[2,1], ylabel = "q", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15, xminorticks = IntervalsBetween(5), xminorticksvisible = true, xminorgridvisible = true)
+ax = Axis(fig[2,1]; ylabel = L"q",xticklabelsvisible = false, lab_args...)
+
 for k in keys(branches)
     P = StateSpaceSet(branches[k])
     scatter!(ax, P[:,1],P[:,3], markersize = 1.0, color = colors[k], rasterize = false)
@@ -86,7 +87,7 @@ for (j,aa) in enumerate(attractors_cont)
 end
 
 yticks = ([1, 2, 4, 8, 16, 32], ["1", "2", "4", "8", "16", "Chaos"])
-ax = Axis(fig[3,1]; ylabel = "periods", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15, yticks, yscale = log2, xminorticks = IntervalsBetween(5), xminorticksvisible = true, xminorgridvisible = true)
+ax = Axis(fig[3,1]; ylabel = "periods",  yticks, xticklabelsvisible = false,yscale = log2, lab_args...)
 for k in 1:length(periods)
     P = StateSpaceSet(periods[k])
     scatter!(ax, P[:,1],P[:,2], markersize = 3.7, color = colors[k], rasterize = false)
@@ -96,8 +97,7 @@ xlims!(ax,δrange[1],δrange[end])
 
 # Add the basin entropy
 @unpack Sb, Sbb = dat_ent
-ax = Axis(fig[4,1], ylabel = L"S_b", yticklabelsize = 10, xticklabelsize = 10, ylabelsize = 15, xlabel = L"\delta", xlabelsize = 20, xminorticks = IntervalsBetween(5), xminorticksvisible = true, xminorgridvisible = true)
-# scatter!(ax, δrange, Sb; markersize = 3)
+ax = Axis(fig[4,1]; ylabel = L"S_b",  xlabel = L"\delta", xticklabelsvisible = true, lab_args...)
 lines!(ax, δrange, Sb; linewidth = 0.5)
 xlims!(ax,δrange[1],δrange[end])
 ylims!(ax, 0.0, 0.3)

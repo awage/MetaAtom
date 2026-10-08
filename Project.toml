@@ -11,6 +11,7 @@ LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
 OrdinaryDiffEqVerner = "79d7bb75-1356-48c1-b8c0-6832512096c2"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [sources]
 Attractors = {path = "../Attractors.jl"}

@@ -148,11 +148,10 @@ uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 version = "1.11.0"
 
 [[deps.Attractors]]
-deps = ["BijectiveHilbert", "BlackBoxOptim", "Clustering", "ComplexityMeasures", "Distances", "Distributions", "DynamicalSystemsBase", "LinearAlgebra", "Mmap", "NearestNeighbors", "Neighborhood", "OhMyThreads", "Optim", "ProgressMeter", "Random", "Reexport", "StateSpaceSets"]
-git-tree-sha1 = "fe87cd506982b6e5017b0ab6ab338e3f6c463eab"
-registries = "General"
+deps = ["BijectiveHilbert", "BlackBoxOptim", "Clustering", "ComplexityMeasures", "Distances", "Distributions", "DynamicalSystemsBase", "LinearAlgebra", "Mmap", "NearestNeighbors", "Neighborhood", "OhMyThreads", "Optim", "ProgressMeter", "Random", "Reexport", "SpecialFunctions", "StateSpaceSets"]
+path = "../Attractors.jl"
 uuid = "f3fd9213-ca85-4dba-9dfd-7fc91308fec7"
-version = "2.0.5"
+version = "2.0.3"
 weakdeps = ["Makie"]
 
     [deps.Attractors.extensions]

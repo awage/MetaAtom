@@ -1,4 +1,4 @@
-include("figs2.jl")
+include("fig2.jl")
 include("fig3.jl")
 include("fig4.jl")
 include("fig5_left.jl")

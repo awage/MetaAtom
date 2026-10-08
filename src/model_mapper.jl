@@ -1,7 +1,8 @@
 using Attractors
 # using OrdinaryDiffEq:Vern9
 using OrdinaryDiffEqVerner
-using LinearAlgebra 
+using LinearAlgebra
+using SHA
 
 
 mutable struct MetaAtomParameters{N}
@@ -12,6 +13,15 @@ mutable struct MetaAtomParameters{N}
     μ::N
     δ::N
 end
+
+# Cache file names: SHA-1 of the exact parameter values. Unlike savename, no
+# rounding (δ = -25.99 and -25.98 get different files) and nothing is dropped
+# (grids and ranges are part of the key). Stable across Julia sessions.
+canonical(p::MetaAtomParameters) = (p.ω, p.σ, p.β, p.η, p.μ, p.δ)
+canonical(r::AbstractRange) = (first(r), last(r), length(r))
+canonical(t::Tuple) = map(canonical, t)
+canonical(x) = x
+hash_name(args...) = bytes2hex(sha1(repr(map(canonical, args))))[1:16]
 
     
 function model_parameters(ω, σ, β, η, μ, δ)

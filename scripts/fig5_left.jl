@@ -38,7 +38,7 @@ Np = 800; Nsamples = 3000
 
 # Compute the fractions and attractor branches
 params = @strdict Np Nsamples δrange dps grid
-dat, _ = produce_or_load(compute_delta_sweep, params, datadir(); prefix = "delta_sweep_zoom", force)
+dat, _ = produce_or_load(compute_delta_sweep, params, datadir(); filename = _ -> hash_name(dps, grid, δrange, Nsamples), prefix = "delta_sweep_zoom", force)
 
 # Get variables from dictionary
 @unpack fractions_cont, attractors_cont, branches = dat

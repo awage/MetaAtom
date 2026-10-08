@@ -1,3 +1,6 @@
+# Path of the file where get_basins caches the basin for (dps, grid)
+basins_file(dps, grid) = datadir("model_basins_" * hash_name(dps, grid) * ".jld2")
+
 function get_basins(dps, grid; force = true, show_progress = true)
     @unpack σ , ω , μ , η , δ , β  = dps
     params = @strdict dps grid σ  ω  μ  η  δ  β show_progress 
@@ -5,6 +8,7 @@ function get_basins(dps, grid; force = true, show_progress = true)
         _get_basins,
         params, 
         datadir();
+        filename = _ -> hash_name(dps, grid),
         prefix = "model_basins", storepatch = false,
         suffix = "jld2", force = force
     )
@@ -18,6 +22,7 @@ function get_basins_tmp(dps, grid; force = true, show_progress = true)
         tmp_f,
         params, 
         datadir();
+        filename = _ -> hash_name(dps, grid),
         prefix = "model_basins", storepatch = false,
         suffix = "jld2", force = force
     )
@@ -68,6 +73,7 @@ function get_entropy_δ_sweep(δrange, dps, grid; force = false)
         compute_entropy_δ_sweep,
         d, 
         datadir();
+        filename = _ -> hash_name(dps, grid, δrange),
         prefix = "model_entropy", storepatch = false,
         suffix = "jld2", force = force
     )

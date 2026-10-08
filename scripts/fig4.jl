@@ -39,7 +39,7 @@ Np = 800; Nsamples = 3000
 
 # Compute the fractions and attractor branches
 params = @strdict Np Nsamples δrange dps grid
-dat, _ = produce_or_load(compute_delta_sweep, params, datadir(); prefix = "delta_sweep_zoom", force)
+dat, _ = produce_or_load(compute_delta_sweep, params, datadir(); filename = _ -> hash_name(dps, grid, δrange, Nsamples), prefix = "delta_sweep_zoom", force)
 
 # Compute the basin entropy for the same range of parameters
 dat_ent = get_entropy_δ_sweep(δrange, dps, grid; force = false)

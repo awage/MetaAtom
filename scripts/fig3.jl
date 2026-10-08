@@ -56,17 +56,23 @@ fig.current_axis.x.xticklabelsvisible = false
 fig.current_axis.x.xlabel = ""
 fig.current_axis.x.ylabel = "Fractions"
 fig.current_axis.x.yticklabelsize = 10
-fig.current_axis.x.ylabelsize = 15
-
+fig.current_axis.x.ylabelsize = 10
+Label(fig[1, 1, TopLeft()], "(a)",
+        fontsize = 10,
+        padding = (0, 50, -10, 0),
+        halign = :right)
+#
 # Add the bifurcation diagram.
-
-# ss = continuation_series(fraction_cont)
-ax = Axis(fig[2,1], ylabel = "q", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15)
+ax = Axis(fig[2,1], ylabel = L"q", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15)
 for k in keys(branches)
     P = StateSpaceSet(branches[k])
     scatter!(ax, P[:,1],P[:,3], markersize = 1.0, color = colors[k], rasterize = false)
 end
 xlims!(ax,δrange[1],δrange[end])
+Label(fig[2, 1, TopLeft()], "(b)",
+        fontsize = 10,
+        padding = (0, 50, -10, 0),
+        halign = :right)
 
 periods = [ Vector{Vector{Float64}}() for k in 1:length(branches)]
 for (j,aa) in enumerate(attractors_cont)
@@ -86,19 +92,27 @@ for (j,aa) in enumerate(attractors_cont)
 end
 
 yticks = ([1, 2, 4, 8, 16, 32], ["1", "2", "4", "8", "16", "Chaos"])
-ax = Axis(fig[3,1]; ylabel = "periods", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 15, yticks, yscale = log2)
+ax = Axis(fig[3,1]; ylabel = "periods", yticklabelsize = 10, xticklabelsvisible = false, ylabelsize = 10, yticks, yscale = log2)
 for k in 1:length(periods)
     P = StateSpaceSet(periods[k])
     scatter!(ax, P[:,1],P[:,2], markersize = 3.7, color = colors[k], rasterize = false)
     lines!(ax, P[:,1],P[:,2]; linewidth = 1, color = colors[k], rasterize = false)
 end
 xlims!(ax,δrange[1],δrange[end])
+Label(fig[3, 1, TopLeft()], "(c)",
+        fontsize = 10,
+        padding = (0, 50, -10, 0),
+        halign = :right)
 
 # Add the basin entropy
 @unpack Sb, Sbb = dat_ent
-ax = Axis(fig[4,1], ylabel = "Sb", yticklabelsize = 10, xticklabelsize = 10, ylabelsize = 15, xlabel = L"\delta", xlabelsize = 20)
+ax = Axis(fig[4,1], ylabel = L"Sb", yticklabelsize = 10, xticklabelsize = 10, ylabelsize = 15, xlabel = L"\delta", xlabelsize = 20)
 scatter!(ax, δrange, Sb; markersize = 3)
 lines!(ax, δrange, Sb; linewidth = 0.5)
 xlims!(ax,δrange[1],δrange[end])
+Label(fig[4, 1, TopLeft()], "(d)",
+        fontsize = 10,
+        padding = (0, 50, -10, 0),
+        halign = :right)
 
 save("fig3.pdf",fig)

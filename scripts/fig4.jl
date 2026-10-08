@@ -50,24 +50,32 @@ dat_ent = get_entropy_δ_sweep(δrange, dps, grid; force = false)
 # First paint the bands for the volume of each attractors
 colors = colors_from_keys(unique_keys(fractions_cont))
 
-lab_args = (yticklabelsize = 10, xticklabelsize = 10,   ylabelsize = 17, xlabelsize = 17, xminorticks = IntervalsBetween(5), xminorticksvisible = true, xminorgridvisible = true)
+lab_args = (yticklabelsize = 10, xticklabelsize = 10,   ylabelsize = 10, xlabelsize = 17, xminorticks = IntervalsBetween(5), xminorticksvisible = true, xminorgridvisible = true)
 
 fig = Figure(size = (400, 400))
 ax = Axis(fig[1,1]; ylabel = "Fractions", xticklabelsvisible = false,lab_args...)
-Attractors.plot_basins_curves!(ax, fractions_cont, δrange; colors) 
+Attractors.plot_basins_curves!(ax, fractions_cont, δrange; colors)
+Label(fig[1, 1, TopLeft()], "(a)",
+        fontsize = 10,
+        padding = (0, 50, -10, 0),
+        halign = :right)
 
 # Custom modification of fig
 
 # Add the bifurcation diagram.
 
 # ss = continuation_series(fraction_cont)
-ax = Axis(fig[2,1]; ylabel = L"q",xticklabelsvisible = false, lab_args...)
+ax = Axis(fig[2,1]; ylabel = L"q",xticklabelsvisible = false, lab_args..., ylabelsize = 17)
 
 for k in keys(branches)
     P = StateSpaceSet(branches[k])
     scatter!(ax, P[:,1],P[:,3], markersize = 1.0, color = colors[k], rasterize = false)
 end
 xlims!(ax,δrange[1],δrange[end])
+Label(fig[2, 1, TopLeft()], "(b)",
+        fontsize = 10,
+        padding = (0, 50, -10, 0),
+        halign = :right)
 
 periods = [ Vector{Vector{Float64}}() for k in 1:length(branches)]
 for (j,aa) in enumerate(attractors_cont)
@@ -87,17 +95,21 @@ for (j,aa) in enumerate(attractors_cont)
 end
 
 yticks = ([1, 2, 4, 8, 16, 32], ["1", "2", "4", "8", "16", "Chaos"])
-ax = Axis(fig[3,1]; ylabel = "periods",  yticks, xticklabelsvisible = false,yscale = log2, lab_args...)
+ax = Axis(fig[3,1]; ylabel = "periods",  yticks, xticklabelsvisible = false, yscale = log2, lab_args...)
 for k in 1:length(periods)
     P = StateSpaceSet(periods[k])
     scatter!(ax, P[:,1],P[:,2], markersize = 3.7, color = colors[k], rasterize = false)
     lines!(ax, P[:,1],P[:,2]; linewidth = 1, color = colors[k], rasterize = false)
 end
 xlims!(ax,δrange[1],δrange[end])
+Label(fig[3, 1, TopLeft()], "(c)",
+        fontsize = 10,
+        padding = (0, 50, -10, 0),
+        halign = :right)
 
 # Add the basin entropy
 @unpack Sb, Sbb = dat_ent
-ax = Axis(fig[4,1]; ylabel = L"S_b",  xlabel = L"\delta", xticklabelsvisible = true, lab_args...)
+ax = Axis(fig[4,1]; ylabel = L"S_b",  xlabel = L"\delta", xticklabelsvisible = true, lab_args..., ylabelsize = 17)
 lines!(ax, δrange, Sb; linewidth = 0.5)
 xlims!(ax,δrange[1],δrange[end])
 ylims!(ax, 0.0, 0.3)
@@ -106,5 +118,9 @@ lines!(ax, [-22.14 ; -22.14], [0.; 0.3]; linewidth = 1.5, linestyle = :dash, col
 lines!(ax, [-27.47; -27.47], [0.;  0.3]; linewidth = 1.5, linestyle = :dash, color = :black)
 lines!(ax, [-25.9; -25.9], [0.;  0.3]; linewidth = 1.5, linestyle = :dashdot, color = :black)
 lines!(ax, [-28.84;  -28.84], [0.; 0.3]; linewidth = 1.5, linestyle = :dash, color = :black)
+Label(fig[4, 1, TopLeft()], "(d)",
+        fontsize = 10,
+        padding = (0, 50, -10, 0),
+        halign = :right)
 
 save("fig4.pdf",fig)

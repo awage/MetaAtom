@@ -23,22 +23,48 @@ using Random: Xoshiro
 include(srcdir("model_mapper.jl"))
 include(srcdir("bifur_diag.jl"))
 
+# Progress log shared by all threads: a "start" line when the mapping at a
+# (δ, σ) begins and a "done" line with its wall time when it ends. A "start"
+# without "done" is a point still running; watch it with tail -f.
+const progress_log = datadir("fig2_cont_progress.log")
+const log_lock = ReentrantLock()
+function log_progress(msg)
+    lock(log_lock) do
+        open(io -> println(io, Libc.strftime("%F %T", time()), "  t", Threads.threadid(), "  ", msg),
+            progress_log, "a")
+    end
+end
+
 # Sampler that always returns the same initial conditions and keeps their
-# labels at each parameter value of the continuation
+# labels at each parameter value of the continuation. It also logs the time
+# spent mapping the initial conditions at each σ.
 struct LabelRecorder{V} <: InitialConditionsSampler
     ics::V
     labels::Vector{Vector{Int}}
+    δ::Float64
+    σrange::Vector{Float64}
+    tstart::Base.RefValue{Float64}
 end
-LabelRecorder(ics) = LabelRecorder(ics, Vector{Int}[])
-Attractors.generate_ics(s::LabelRecorder, args...) = s.ics
+LabelRecorder(ics, δ, σrange) = LabelRecorder(ics, Vector{Int}[], δ, collect(σrange), Ref(0.0))
+current_σ(s::LabelRecorder) = s.σrange[length(s.labels) + 1]
+function Attractors.generate_ics(s::LabelRecorder, args...)
+    s.tstart[] = time()
+    log_progress("start δ = $(s.δ), σ = $(current_σ(s))")
+    return s.ics
+end
 Base.length(s::LabelRecorder) = length(s.ics)
-Attractors.update_sampler!(s::LabelRecorder, labels, args...) = push!(s.labels, copy(labels))
+function Attractors.update_sampler!(s::LabelRecorder, labels, args...)
+    dt = time() - s.tstart[]
+    log_progress("done  δ = $(s.δ), σ = $(current_σ(s)), $(round(dt; digits = 1)) s, " *
+        "$(length(unique(labels))) labels, $(count(==(-1), labels)) lost")
+    push!(s.labels, copy(labels))
+end
 
 function compute_sigma_continuation(d)
     @unpack dps, σrange, ics, nneigh = d
 
     # compute global continuation of attractors
-    sampler = LabelRecorder(ics)
+    sampler = LabelRecorder(ics, dps.δ, σrange)
     mapper = get_mapper(dps)
     matcher = MatchBySSSetDistance(; distance = Hausdorff())
     ascm = AttractorSeedContinueMatch(mapper, matcher)

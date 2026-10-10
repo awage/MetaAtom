@@ -46,15 +46,16 @@ function get_mapper(dps::MetaAtomParameters)
     yg =  collect(range(-30, 30; length = 1501))
     grid = (yg, yg)
     mapper = AttractorsViaRecurrences(smap, grid; 
-                    consecutive_basin_steps = 100, 
+                    consecutive_basin_steps = 10, 
                     consecutive_recurrences = 2000,
-                    attractor_locate_steps = 1000)
+                    attractor_locate_steps = 1000,
+                    maximum_iterations = 1e5)
     return mapper
 end
 
 function get_smap(dps::MetaAtomParameters)
     (;ω, σ, β, η, μ, δ) = dps
-    diffeq = (alg = Vern9(), reltol = 1e-8, maxiters = 1e6)
+    diffeq = (alg = Vern9(), reltol = 1e-8, maxiters = 1e10)
     ds = CoupledODEs(oscillator_model!, rand(2), dps; diffeq)
     smap = StroboscopicMap(ds, 2*pi/ω) # Stroboscopic map definition
     return smap

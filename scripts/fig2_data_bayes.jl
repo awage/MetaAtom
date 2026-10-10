@@ -93,9 +93,9 @@ Np = 200
 
 # Bayesian sampler. βprior is the Dirichlet pseudo-count (β is taken by the model)
 region = ((-5.0, 5.0), (-5.0, 5.0))
-n_tiles = 25        # 25² boxes of side 0.4
-sparse_n = 10       # ics per box at each σ: 6250 in total
-dense_n = sparse_n^2  # ics per box at the first σ and when a box raises an alarm
+n_tiles = 1        # 25² boxes of side 0.4
+sparse_n = 100       # ics per box at each σ: 6250 in total
+dense_n = 5000  # ics per box at the first σ and when a box raises an alarm
 λ = 0.7             # forgetting factor of the priors
 βprior = 0.5
 global_reset = true   # re-learn every box when the set of attractors changes

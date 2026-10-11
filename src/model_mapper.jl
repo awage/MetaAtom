@@ -28,14 +28,14 @@ function model_parameters(ω, σ, β, η, μ, δ)
     return MetaAtomParameters(ω, σ, β, η, μ, δ)
 end
 
-function oscillator_model!(du, u, p, t)
+function oscillator_model(du, u, p, t)
     (;ω, σ, β, η, μ, δ) = p
     u1 = u[1]
     u2 = u[2]
 
-    du[1] = u2
-    du[2] = -σ*u2 -u1 +β*u1^2 -η*u1^3 +  μ*cos(ω*t) + δ
-    return nothing
+    du1 = u2
+    du2 = -σ*u2 -u1 +β*u1^2 -η*u1^3 +  μ*cos(ω*t) + δ
+    return SVector(du1, du2)
 end
 
     # du1 = u[2]
@@ -56,7 +56,7 @@ end
 function get_smap(dps::MetaAtomParameters)
     (;ω, σ, β, η, μ, δ) = dps
     diffeq = (alg = Vern9(), reltol = 1e-8, abstol = 1e-8, maxiters = 1e10)
-    ds = CoupledODEs(oscillator_model!, rand(2), dps; diffeq)
+    ds = CoupledODEs(oscillator_model, SVector(0.0, 0.0), dps; diffeq)
     smap = StroboscopicMap(ds, 2*pi/ω) # Stroboscopic map definition
     return smap
 end

@@ -49,7 +49,7 @@ function get_mapper(dps::MetaAtomParameters)
                     consecutive_basin_steps = 10, 
                     consecutive_recurrences = 2000,
                     attractor_locate_steps = 1000,
-                    maximum_iterations = 5e3)
+                    maximum_iterations = 1e6)
     return mapper
 end
 

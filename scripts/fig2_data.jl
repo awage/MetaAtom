@@ -18,7 +18,7 @@ include(srcdir("bifur_diag.jl"))
 redo_failed = false
 σ = 0.3; ω = 1.0; μ = 35.0; η = 0.08; δ = 1.0; β = 0.4
 dps = model_parameters(ω, σ, β, η, μ, δ)
-res = 500
+res = 50
 yg = range(-5,5, length=res); grid = (yg, yg)
 Np = 200
 δrange = range(-30, 30, length = Np)

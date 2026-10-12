@@ -28,7 +28,10 @@ function model_parameters(ω, σ, β, η, μ, δ)
     return MetaAtomParameters(ω, σ, β, η, μ, δ)
 end
 
-function oscillator_model(du, u, p, t)
+# Out-of-place form (u, p, t) returning an SVector. It must not take a du
+# argument: CoupledODEs treats any 4-argument function as in-place, and would
+# then discard the returned value and leave the state frozen.
+function oscillator_model(u, p, t)
     (;ω, σ, β, η, μ, δ) = p
     u1 = u[1]
     u2 = u[2]
@@ -70,7 +73,7 @@ end
 function get_trajectory_ode(u0, T, dps::MetaAtomParameters)
     (;ω, σ, β, η, μ, δ) = dps
     diffeq = (alg = Vern9(), reltol = 1e-8, maxiters = 1e6)
-    ds = CoupledODEs(oscillator_model!, rand(2), dps; diffeq)
+    ds = CoupledODEs(oscillator_model, SVector(0.0, 0.0), dps; diffeq)
     y,t = trajectory(ds, T, u0; Δt = 0.01) 
     return  y,t 
 end

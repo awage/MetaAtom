@@ -1,9 +1,11 @@
 # Path of the file where get_basins caches the basin for (dps, grid)
 basins_file(dps, grid) = datadir("model_basins_" * hash_name(dps, grid) * ".jld2")
 
-function get_basins(dps, grid; force = true, show_progress = true)
+# att0: attractors to seed the mapper with (see get_mapper), or nothing.
+# It is not part of the cache key.
+function get_basins(dps, grid; force = true, show_progress = true, att0 = nothing)
     @unpack σ , ω , μ , η , δ , β  = dps
-    params = @strdict dps grid σ  ω  μ  η  δ  β show_progress 
+    params = @strdict dps grid σ  ω  μ  η  δ  β show_progress att0
     data, file = produce_or_load(
         _get_basins,
         params, 
@@ -17,8 +19,8 @@ end
 
 
 function _get_basins(d) 
-    @unpack dps, grid, show_progress = d 
-        mapper = get_mapper(dps)
+    @unpack dps, grid, show_progress, att0 = d 
+        mapper = get_mapper(dps; att = att0)
         bas, att = basins_of_attraction(mapper, grid; show_progress) 
     return @strdict(att, bas, dps) 
 end

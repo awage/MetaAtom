@@ -44,7 +44,10 @@ end
     # du1 = u[2]
     # du2 = -d*u[2] + u[1] - u[1]^3 + F*sin(omega*t)
 
-function get_mapper(dps::MetaAtomParameters)
+# att: attractors (Dict label => StateSpaceSet) already found with the same
+# parameters, e.g. on a coarse grid, or nothing. Mapping one point of each,
+# in label order, lets the mapper find them again at once, with the same labels.
+function get_mapper(dps::MetaAtomParameters; att = nothing)
     smap = get_smap(dps)
     yg =  collect(range(-30, 30; length = 15001))
     grid = (yg, yg)
@@ -53,6 +56,9 @@ function get_mapper(dps::MetaAtomParameters)
                     consecutive_recurrences = 2000,
                     attractor_locate_steps = 1000,
                     maximum_iterations = 1e6)
+    isnothing(att) || for (_, A) in sort(collect(att); by = first)
+        mapper(A[1]; show_progress = false)
+    end
     return mapper
 end
 

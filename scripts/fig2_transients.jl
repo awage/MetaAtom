@@ -32,7 +32,7 @@ for c in all_cases
     dp = deepcopy(dps)
     dp.δ = δrange[j]
     dp.σ = σrange[k]
-    data = get_basins(dp, grid_coarse; show_progress = false)
+    data = get_basins(dp, grid_coarse; force = false, show_progress = false)
     @unpack att = data
     mapper = get_mapper(dp)
     # Seed the mapper with the known attractors (a = label => StateSpaceSet)

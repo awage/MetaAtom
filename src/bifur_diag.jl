@@ -15,24 +15,6 @@ function get_basins(dps, grid; force = true, show_progress = true)
     return data
 end
 
-function get_basins_tmp(dps, grid; force = true, show_progress = true)
-    @unpack σ , ω , μ , η , δ , β  = dps
-    params = @strdict dps grid σ  ω  μ  η  δ  β show_progress 
-    data, file = produce_or_load(
-        tmp_f,
-        params, 
-        datadir();
-        filename = _ -> hash_name(dps, grid),
-        prefix = "model_basins", storepatch = false,
-        suffix = "jld2", force = force
-    )
-    return data
-end
-
-function tmp_f(d)
-  a = 0
-  return @strdict(a)
-end
 
 function _get_basins(d) 
     @unpack dps, grid, show_progress = d 
@@ -41,13 +23,6 @@ function _get_basins(d)
     return @strdict(att, bas, dps) 
 end
 
-
-# function get_basin_entropy(dps, grid; force = false, show_progress = false) 
-#         data = get_basins(dps, grid)
-#         @unpack bas = data
-#         Sb,Sbb = basin_entropy(bas, 10) 
-#         return Sb, Sbb, bas
-# end
 
 function compute_entropy_δ_sweep(d)
     @unpack  δrange, dps, grid = d

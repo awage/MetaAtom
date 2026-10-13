@@ -6,18 +6,14 @@ using ProgressMeter
 include(srcdir("model_mapper.jl"))
 include(srcdir("bifur_diag.jl"))
 
-redo_failed = false
 σ = 0.3; ω = 1.0; μ = 35.0; η = 0.08; δ = 1.0; β = 0.4
 dps = model_parameters(ω, σ, β, η, μ, δ)
 res_coarse = 50
-res_fine = 500
 grid_of(res) = (range(-5, 5, length = res), range(-5, 5, length = res))
 grid_coarse = grid_of(res_coarse)
-grid = grid_of(res_fine)
 Np = 200
 δrange = range(-30, 30, length = Np)
 σrange = range(0.1, 0.5, length = Np)
-force = false
 all_cases = vec(CartesianIndices((Np, Np)))
 
 
@@ -28,7 +24,7 @@ grid_transient = grid_of(res)
 transients = zeros(Np,Np)
 
 for c in all_cases
-    j, k = Tuple(c)
+    @show j, k = Tuple(c)
     dp = deepcopy(dps)
     dp.δ = δrange[j]
     dp.σ = σrange[k]

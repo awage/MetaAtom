@@ -1,20 +1,3 @@
-# Data for Fig. 2: number of attractors, basin entropy and boundary basin
-# entropy on a (δ, σ) grid. Run with several threads: julia -t auto fig2_data.jl
-#
-# Two passes. The first computes every basin on a coarse res_coarse² grid of
-# initial conditions, only to count the attractors. The second recomputes on the
-# fine res_fine² grid only the points where the first pass found at least two
-# attractors (or failed). Points with a single attractor get Na = 1 and
-# Sb = Sbb = 0 without a fine basin; these are the expensive ones when the
-# transients are long.
-#
-# Each basin is cached by get_basins (the grid is part of the file name), so an
-# interrupted run resumes where it stopped. Parameter points that fail in the
-# fine pass (an exception, or initial conditions labelled -1 because the mapper
-# did not converge) get NaN and are listed in data/fig2_failed.tsv. To redo
-# them: tighten the tolerances in get_mapper / get_smap, set redo_failed = true
-# and run again. Only the listed files are recomputed; everything else is loaded
-# from the cache.
 using DrWatson
 @quickactivate
 using Attractors
@@ -34,13 +17,14 @@ grid = grid_of(res_fine)
 Np = 200
 δrange = range(-30, 30, length = Np)
 σrange = range(0.1, 0.5, length = Np)
-failed_file = datadir("fig2_failed.tsv")
+force = false
+# failed_file = datadir("fig2_failed.tsv")
 
-to_redo = Set{String}()
-if redo_failed && isfile(failed_file)
-    to_redo = Set(first(split(l, '\t')) for l in readlines(failed_file)[2:end])
-    println("Recomputing $(length(to_redo)) failed basins")
-end
+# to_redo = Set{String}()
+# if redo_failed && isfile(failed_file)
+#     to_redo = Set(first(split(l, '\t')) for l in readlines(failed_file)[2:end])
+#     println("Recomputing $(length(to_redo)) failed basins")
+# end
 
 # Basin of the point (j, k) on grid g, and its Sb, Sbb and Na. A failure is
 # returned as a non empty reason, with NaN values.
@@ -50,7 +34,7 @@ function basin_stats(j, k, g)
     dp.σ = σrange[k]
     file = basins_file(dp, g)
     try
-        data = get_basins(dp, g; force = file in to_redo, show_progress = false)
+        data = get_basins(dp, g; force, show_progress = false)
         @unpack bas = data
         nlost = count(==(-1), bas)
         nlost > 0 && return NaN, NaN, NaN, file, "$nlost initial conditions labelled -1"
@@ -105,3 +89,4 @@ end
 println("$(length(failed)) of $(length(fine_cases)) fine basins failed, listed in $failed_file")
 
 wsave(datadir("fig2_data.jld2"), @strdict Sb Sbb Na Na_coarse δrange σrange dps grid grid_coarse)
+

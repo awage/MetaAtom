@@ -21,7 +21,9 @@ end
 function _get_basins(d) 
     @unpack dps, grid, show_progress, att0 = d 
         mapper = get_mapper(dps; att = att0)
-        bas, att = basins_of_attraction(mapper, grid; show_progress) 
+        boa = basins_of_attraction(mapper, grid; show_progress)
+        bas = extract_basins(boa)
+        att = extract_attractors(boa)
     return @strdict(att, bas, dps) 
 end
 

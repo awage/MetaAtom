@@ -10,17 +10,19 @@ include(srcdir("bifur_diag.jl"))
 function compute_delta_sweep(params::Dict)
     @unpack  δrange, Np, Nsamples, dps, grid= params
 
-    # compute globl continuation of attractors
-    sampler, _ = statespace_sampler(grid) 
+    # compute global continuation of attractors: Nsamples random initial
+    # conditions in grid at each δ
+    sampler = RandomICsSampler(Nsamples, grid)
     mapper = get_mapper(dps)
 
     matcher = MatchBySSSetDistance(; distance = Hausdorff())
     ascm = AttractorSeedContinueMatch(mapper, matcher)
     pidx = :δ
+    pcurve = [Dict(pidx => δ) for δ in δrange]
 
-    fractions_cont, attractors_cont = global_continuation(
-        ascm, δrange, pidx, sampler; samples_per_parameter = Nsamples
-    )
+    out = global_continuation(ascm, pcurve, sampler)
+    fractions_cont = out.fractions
+    attractors_cont = out.attractors
 
     branches = get_branches(δrange, pidx, dps, attractors_cont)
 

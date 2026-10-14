@@ -32,7 +32,7 @@ function compute_entropy_δ_sweep(d)
     @unpack  δrange, dps, grid = d
     Sb = zeros(length(δrange))
     Sbb = zeros(length(δrange))
-    @Threads.threads for k in eachindex(δrange)
+    @Threads.threads :greedy for k in eachindex(δrange)
         @show δrange[k]
         dp = deepcopy(dps) 
         dp.δ = δrange[k]

@@ -6,7 +6,6 @@ using ProgressMeter
 include(srcdir("model_mapper.jl"))
 include(srcdir("bifur_diag.jl"))
 
-redo_failed = false
 σ = 0.3; ω = 1.0; μ = 35.0; η = 0.08; δ = 1.0; β = 0.4
 dps = model_parameters(ω, σ, β, η, μ, δ)
 res_coarse = 50
@@ -20,15 +19,6 @@ Np = 200
 force = false
 failed_file = datadir("fig2_failed.tsv")
 
-# to_redo = Set{String}()
-# if redo_failed && isfile(failed_file)
-#     to_redo = Set(first(split(l, '\t')) for l in readlines(failed_file)[2:end])
-#     println("Recomputing $(length(to_redo)) failed basins")
-# end
-
-# Basin of the point (j, k) on grid g, and its Sb, Sbb, Na and attractors. A
-# failure is returned as a non empty reason, with NaN values. att0 seeds the
-# mapper with known attractors (see get_mapper).
 function basin_stats(j, k, g; att0 = nothing)
     dp = deepcopy(dps)
     dp.δ = δrange[j]
@@ -47,10 +37,6 @@ function basin_stats(j, k, g; att0 = nothing)
     end
 end
 
-# Compute basin_stats on grid g for every case, in parallel. Seeds[j, k] are the
-# attractors to seed the mapper with, or nothing. :greedy hands out one case at
-# a time: the cost per case is very uneven (slow at low σ), and :dynamic would
-# leave most threads idle at the end.
 function run_pass(cases, g, desc; seeds = fill(nothing, Np, Np))
     Sb = fill(NaN, Np, Np)
     Sbb = fill(NaN, Np, Np)
@@ -76,8 +62,6 @@ _, _, Na_coarse, Att_coarse, failed_coarse = run_pass(all_cases, grid_coarse, "C
 # Second pass: fine basins where there are at least two attractors. Points that
 # failed on the coarse grid (Na_coarse = NaN) are also recomputed.
 fine_cases = filter(c -> !(Na_coarse[c] < 2), all_cases)
-println("$(length(fine_cases)) of $(length(all_cases)) points have at least two attractors ",
-    "or failed in the coarse pass ($(length(failed_coarse)) failed)")
 # The fine pass is seeded with the attractors of the coarse pass (same mapper).
 Sb, Sbb, Na, _, failed = run_pass(fine_cases, grid, "Fine pass: "; seeds = Att_coarse)
 

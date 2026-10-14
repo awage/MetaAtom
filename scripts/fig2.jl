@@ -34,4 +34,3 @@ args =  (yticklabelsize = 25, xticklabelsvisible = true, ylabelsize = 35, xtickl
     heatmap!(ax, δrange, σrange, Na; rasterize = true, colormap = sch)
 Colorbar(fig[1, 2],  limits = (1, maximum(filter(!isnan,Na))), colormap = sch, ticklabelsize = 25)
     save(string("fig2a",  ".png"), fig)
-# end
